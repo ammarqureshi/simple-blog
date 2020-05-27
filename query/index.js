@@ -8,10 +8,12 @@ app.use(cors());
 
 const posts = {};
 
+//client will make a request to get all posts
 app.get('/posts', (req, res) => {
   res.send(posts);
 });
 
+//store in a data structure the posts and their corresponding comments
 app.post('/events', (req, res) => {
   const { type, data } = req.body;
 
@@ -22,10 +24,20 @@ app.post('/events', (req, res) => {
   }
 
   if (type === 'CommentCreated') {
-    const { id, content, postId } = data;
+    const { id, content, postId, status } = data;
 
     const post = posts[postId];
-    post.comments.push({ id, content });
+    post.comments.push({ id, content, status });
+  }
+
+  if (type === 'CommentUpdated') {
+    const { id, content, postId, status } = data;
+    const post = posts[postId];
+    const comment = post.comments.find((comment) => {
+      return (comment.id = id);
+    });
+    comment.status = status;
+    comment.content = content;
   }
 
   console.log(posts);
